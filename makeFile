@@ -1,0 +1,42 @@
+.PHONY: run dnBuild update build buildios clear install doctor easInstall convertToApk generate codegen
+
+args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-}`
+
+# Start the dev server
+run:;npx expo start
+
+# to download development builds pvia terminal
+dnBuild:;eas build:run -p android
+
+# to make a new update
+update:;eas update --profile development 
+
+# to make a new build locally
+build:;eas build --platform android --local
+buildios:;eas build --platform ios --local
+
+# to create a new build on the expo dashboard
+buildCloud:;eas build --profile development --platform android
+
+buildCloudIos:;eas build --profile development --platform ios
+
+# clear the npm cache
+clear:;npm cache clean --force
+
+# install:;npm install
+
+install:; npm install $(call args)
+
+generate:; graphql-codegen --config codegen.yml
+
+codegen:; graphql-codegen --config codegen.yml -w
+
+
+
+# Runs a check on the project to see if there are any issues
+doctor:;npx expo-doctor
+
+easInstall:;npm install -g eas-cli
+
+convertToApk:;java -jar bundletool.jar build-apks --bundle=nhl.aab --output=nhl.apks --mode=universal
+
